@@ -27,7 +27,7 @@ const client = new Client(dbConfig);
 client.connect();
 
 // get all pastes
-app.get("/pastebin", async (req, res) => {
+app.get("/", async (req, res) => {
   const pastes = await client.query('select * from paste');
   res.status(200).json({
     status: "succes",
