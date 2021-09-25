@@ -39,7 +39,7 @@ app.get("/", async (req, res) => {
 
 // post a paste
 
-app.post("/pastebin", async(req, res) => {
+app.post("/", async(req, res) => {
   const { content } = req.body;
   if (typeof content === "string"){
     const newPaste = await client.query("INSERT INTO paste (content) VALUES ($1) RETURNING *", [content]);
