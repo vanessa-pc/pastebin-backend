@@ -11,7 +11,7 @@ config(); //Read .env file lines as though they were env vars.
 //For the ssl property of the DB connection config, use a value of...
 // false - when connecting to a local DB
 // { rejectUnauthorized: false } - when connecting to a heroku DB
-const herokuSSLSetting = { rejectUnauthorized: false }
+const herokuSSLSetting = { rejectUnauthorized: false, }
 const sslSetting = process.env.LOCAL ? false : herokuSSLSetting
 const dbConfig = {
   connectionString: process.env.DATABASE_URL,
@@ -26,11 +26,38 @@ app.use(cors()) //add CORS support to each following route handler
 const client = new Client(dbConfig);
 client.connect();
 
-app.get("/", async (req, res) => {
-  const dbres = await client.query('select * from categories');
-  res.json(dbres.rows);
+// get all pastes
+app.get("/pastebin", async (req, res) => {
+  const pastes = await client.query('select * from paste');
+  res.status(200).json({
+    status: "succes",
+    data: {
+      pastes,
+    }
+  });
 });
 
+// post a paste
+
+app.post("/pastebin", async(req, res) => {
+  const { content } = req.body;
+  if (typeof content === "string"){
+    const newPaste = await client.query("INSERT INTO paste (content) VALUES ($1) RETURNING *", [content]);
+    res.status(201).json({
+      status: "success",
+      data: {
+        newPaste,
+      }
+    });
+  } else {
+    res.status(400).json({
+      status: "request failed", 
+      data: {
+        text: "Content needs to be of string type."
+      }
+    });
+  }
+});
 
 //Start the server on the given port
 const port = process.env.PORT;
