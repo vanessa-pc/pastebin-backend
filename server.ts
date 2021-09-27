@@ -64,7 +64,7 @@ app.post("/", async(req, res) => {
   }
 
 });
-client.end();
+
 
 //Start the server on the given port
 const port = process.env.PORT;
