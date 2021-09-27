@@ -40,23 +40,29 @@ app.get("/", async (req, res) => {
 // post a paste
 
 app.post("/", async(req, res) => {
-  const { content } = req.body;
-  if (typeof content === "string"){
-    const newPaste = await client.query("INSERT INTO paste (content) VALUES ($1) RETURNING *", [content]);
-    res.status(201).json({
-      status: "success",
-      data: {
-        newPaste,
-      }
-    });
-  } else {
-    res.status(400).json({
-      status: "request failed", 
-      data: {
-        text: "Content needs to be of string type."
-      }
-    });
+  try {
+    const { content } = req.body;
+    if (typeof content === "string"){
+      const newPaste = await client.query("INSERT INTO paste (content) VALUES ($1) RETURNING *", [content]);
+      res.status(201).json({
+        status: "success",
+        data: {
+          newPaste,
+        }
+      });
+    } else {
+      res.status(400).json({
+        status: "request failed", 
+        data: {
+          text: "Content needs to be of string type."
+        }
+      });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).send(error);    
   }
+
 });
 
 //Start the server on the given port
